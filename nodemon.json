@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "js,ts,json",
+  "ignore": ["node_modules", "dist"],
+  "exec": "yarn start",
+  "restartable": "rs"
+}
