@@ -17,9 +17,9 @@ export function generateRefreshToken(id: string) {
   return generateJWT({ id }, "7d");
 }
 
-export function verifyRefreshToken(refreshToken: string) {
+export function verifyToken(token: string) {
   try {
-    const decoded = jwt.verify(refreshToken, SECRET_KEY);
+    const decoded = jwt.verify(token, SECRET_KEY);
     return { valid: true, decoded };
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {
