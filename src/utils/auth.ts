@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Request } from "express";
 
 dotenv.config();
 
@@ -39,4 +40,8 @@ export function validateCredentials(id: string, password: string) {
   }
 
   return null;
+}
+
+export function getAccessToken(req: Request) {
+  return req.cookies?.access_token || req.headers?.authorization?.split(" ")[1];
 }

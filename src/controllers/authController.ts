@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
-import { generateAccessToken, generateRefreshToken, validateCredentials, verifyToken } from "../utils/auth";
+import { generateAccessToken, generateRefreshToken, getAccessToken, validateCredentials, verifyToken } from "../utils/auth";
 import Token from "../models/Token";
 
 export const signin = async (req: Request, res: Response): Promise<any> => {
@@ -81,7 +81,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 };
 
 export const getUserInfo = async (req: Request, res: Response): Promise<any> => {
-  const accessToken = req.cookies?.access_token || req.headers?.authorization?.split(" ")[1];
+  const accessToken = getAccessToken(req);
 
   try {
     const result = verifyToken(accessToken);
@@ -93,6 +93,27 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any> => 
     const { id } = result.decoded as Record<string, any>;
 
     return res.status(200).json({ id });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const logout = async (req: Request, res: Response): Promise<any> => {
+  const accessToken = getAccessToken(req);
+
+  try {
+    const result = verifyToken(accessToken);
+    if (!result.valid) return res.status(403).json({ error: result.reason === "expired" ? "Access token expired" : "Invalid access token" });
+
+    const savedToken = await Token.findOne({ where: { accessToken } });
+    if (!savedToken) return res.status(403).json({ error: "Invalid access token" });
+
+    const { id } = result.decoded as Record<string, any>;
+
+    await Token.destroy({ where: { id } });
+
+    return res.status(200).json({ message: "User logged out" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
