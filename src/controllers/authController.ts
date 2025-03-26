@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
-import { generateAccessToken, generateRefreshToken, getAccessToken, validateCredentials, verifyToken } from "../utils/auth";
+import { generateAccessToken, generateRefreshToken, getAccessToken, getAccessTokenId, validateCredentials, getRefreshTokenId } from "../utils/auth";
 import Token from "../models/Token";
 
 export const signin = async (req: Request, res: Response): Promise<any> => {
@@ -37,13 +37,10 @@ export const updateAccessToken = async (req: Request, res: Response): Promise<an
   try {
     if (!refreshToken) return res.status(401).json({ error: "Refresh token required" });
 
-    const result = verifyToken(refreshToken);
-    if (!result.valid) return res.status(403).json({ error: result.reason === "expired" ? "Refresh token expired" : "Invalid refresh token" });
+    const result = await getRefreshTokenId(refreshToken);
+    if (!result.valid) return res.status(403).json({ error: result.error });
 
-    const savedToken = await Token.findOne({ where: { refreshToken } });
-    if (!savedToken) return res.status(403).json({ error: "Invalid refresh token" });
-
-    const { id } = result.decoded as Record<string, any>;
+    const id = result.id;
     const accessToken = generateAccessToken(id);
 
     await Token.update({ accessToken }, { where: { id: id } });
@@ -84,13 +81,10 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any> => 
   const accessToken = getAccessToken(req);
 
   try {
-    const result = verifyToken(accessToken);
-    if (!result.valid) return res.status(403).json({ error: result.reason === "expired" ? "Access token expired" : "Invalid access token" });
+    const result = await getAccessTokenId(accessToken);
+    if (!result.valid) return res.status(403).json({ error: result.error });
 
-    const savedToken = await Token.findOne({ where: { accessToken } });
-    if (!savedToken) return res.status(403).json({ error: "Invalid access token" });
-
-    const { id } = result.decoded as Record<string, any>;
+    const id = result.id;
 
     return res.status(200).json({ id });
   } catch (error) {
@@ -103,13 +97,10 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
   const accessToken = getAccessToken(req);
 
   try {
-    const result = verifyToken(accessToken);
-    if (!result.valid) return res.status(403).json({ error: result.reason === "expired" ? "Access token expired" : "Invalid access token" });
+    const result = await getAccessTokenId(accessToken);
+    if (!result.valid) return res.status(403).json({ error: result.error });
 
-    const savedToken = await Token.findOne({ where: { accessToken } });
-    if (!savedToken) return res.status(403).json({ error: "Invalid access token" });
-
-    const { id } = result.decoded as Record<string, any>;
+    const id = result.id;
 
     await Token.destroy({ where: { id } });
 
