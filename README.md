@@ -20,22 +20,10 @@ cp .env.example .env
 yarn install
 ```
 
-5. Create a database:
-
-```sh
-yarn db:create
-```
-
-6. Start the server:
+5. Run the `start` command, it will create the database, start the server and perform migrations:
 
 ```sh
 yarn start
 ```
 
-7. After the server starts and displays the message "Database connected", perform the migrations:
-
-```sh
-yarn db:migrate
-```
-
-8. Everything is ready!
+If everything went well, you should see the message "✅ Setup complete. Server is ready!"

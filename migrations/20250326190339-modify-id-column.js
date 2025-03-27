@@ -3,7 +3,7 @@ export async function up(queryInterface, Sequelize) {
     type: Sequelize.STRING(255),
     allowNull: false,
   });
-  await queryInterface.changeColumn("refresh_tokens", "id", {
+  await queryInterface.changeColumn("tokens", "id", {
     type: Sequelize.STRING(255),
     allowNull: false,
   });
@@ -13,7 +13,7 @@ export async function down(queryInterface, Sequelize) {
     type: Sequelize.INTEGER,
     allowNull: false,
   });
-  await queryInterface.changeColumn("refresh_tokens", "id", {
+  await queryInterface.changeColumn("tokens", "id", {
     type: Sequelize.INTEGER,
     allowNull: false,
   });

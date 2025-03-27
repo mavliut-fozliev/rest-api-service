@@ -4,10 +4,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "yarn run build && node dist/index.js",
+    "serve": "yarn build && node dist/index.js",
     "dev": "nodemon",
     "db:create": "node scripts/createDatabase.js",
-    "db:migrate": "npx sequelize-cli db:migrate --config src/config/config.js"
+    "db:migrate": "npx sequelize-cli db:migrate --config src/config/config.js",
+    "start": "yarn db:create && yarn serve"
   },
   "keywords": [],
   "author": "",
