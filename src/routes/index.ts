@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { signin, updateAccessToken, signup, getUserInfo, logout } from "../controllers/authController";
-import { deleteFile, getFiles, uploadFile } from "../controllers/fileController";
+import { deleteFile, getFiles, uploadFile, getFileInfo } from "../controllers/fileController";
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router.get("/logout", logout);
 router.post("/file/upload", uploadFile);
 router.get("/file/list", getFiles);
 router.delete("/file/delete/:id", deleteFile);
+router.get("/file/:id", getFileInfo);
 
 export default router;

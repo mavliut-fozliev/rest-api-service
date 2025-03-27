@@ -93,3 +93,24 @@ export const deleteFile = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getFileInfo = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const accessToken = getAccessToken(req);
+
+    const result = await decodeAccessToken(accessToken);
+    if (!result.valid) return res.status(403).json({ message: result.error });
+
+    const { id } = req.params;
+    const file = await File.findByPk(id);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.json(file);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
