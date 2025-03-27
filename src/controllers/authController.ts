@@ -3,7 +3,6 @@ import User from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken, getAccessToken, decodeAccessToken, validateCredentials, decodeRefreshToken } from "../utils/auth";
 import Token from "../models/Token";
-import { AppError } from "../utils/errorHandling";
 
 export const signin = async (req: Request, res: Response): Promise<any> => {
   const { id, password, deviceId } = req.body;
