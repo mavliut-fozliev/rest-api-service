@@ -114,3 +114,35 @@ export const getFileInfo = async (req: Request, res: Response): Promise<any> => 
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const downloadFile = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const accessToken = getAccessToken(req);
+
+    const result = await decodeAccessToken(accessToken);
+    if (!result.valid) return res.status(403).json({ message: result.error });
+
+    const { id } = req.params;
+    const file = await File.findByPk(id);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const filePath = path.join(getStoragePath(), file.id + file.extension);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "The file is missing from the server" });
+    }
+
+    res.download(filePath, file.name + file.extension, (err) => {
+      if (err) {
+        console.error("Error while downloading:", err);
+        res.status(500).json({ message: "Error downloading file" });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
