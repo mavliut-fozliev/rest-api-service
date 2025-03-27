@@ -2,9 +2,11 @@ import { Request } from "express";
 import multer from "multer";
 import path from "path";
 
+const folder = "uploads";
+
 const storage = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb: Function) => {
-    cb(null, "./uploads/");
+    cb(null, `./${folder}/`);
   },
   filename: (req: Request, file: Express.Multer.File, cb: Function) => {
     const fileExtension = path.extname(file.originalname);
@@ -13,4 +15,6 @@ const storage = multer.diskStorage({
   },
 });
 
-export const upload = multer({ storage: storage });
+export const upload = multer({ storage });
+
+export const getStoragePath = () => path.join(__dirname, "..", "..", folder);
