@@ -3,6 +3,7 @@ import User from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken, getAccessToken, decodeAccessToken, validateCredentials, decodeRefreshToken } from "../utils/auth";
 import Token from "../models/Token";
+import { handleServerError } from "../utils/errorHandling";
 
 export const signin = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -26,8 +27,7 @@ export const signin = async (req: Request, res: Response): Promise<any> => {
 
     return res.json({ accessToken, refreshToken });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
@@ -46,8 +46,7 @@ export const updateAccessToken = async (req: Request, res: Response): Promise<an
 
     return res.json({ accessToken });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
@@ -71,37 +70,23 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     return res.status(201).json({ message: "User registered successfully", accessToken, refreshToken });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const getUserInfo = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
-    return res.status(200).json({ id: result.id });
+    return res.status(200).json({ id: req.params.userId });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const logout = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
-    await Token.destroy({ where: { userId: result.id, deviceId: result.deviceId } });
-
+    await Token.destroy({ where: { userId: req.params.userId, deviceId: req.params.deviceId } });
     return res.status(200).json({ message: "User logged out" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };

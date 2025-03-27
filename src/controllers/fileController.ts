@@ -2,16 +2,12 @@ import { decodeAccessToken, getAccessToken } from "../utils/auth";
 import { Request, Response } from "express";
 import path from "path";
 import File from "../models/File";
-import { getStoragePath } from "../utils/storage";
+import { getStoragePath } from "../middlewares/storage";
 import fs from "fs";
+import { handleServerError } from "../utils/errorHandling";
 
 export const uploadFile = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const file = req.file;
     if (!file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -33,18 +29,12 @@ export const uploadFile = async (req: Request, res: Response): Promise<any> => {
 
     res.status(200).json({ message: `File uploaded successfully, id: ${id}` });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const getFiles = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const list_size = parseInt(String(req.query.list_size)) || 10;
     const page = parseInt(String(req.query.page)) || 1;
 
@@ -58,18 +48,12 @@ export const getFiles = async (req: Request, res: Response): Promise<any> => {
 
     res.json({ total: count, page, list_size, total_pages: Math.ceil(count / list_size), files: rows });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const deleteFile = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const { id } = req.params;
     const file = await File.findByPk(id);
 
@@ -89,18 +73,12 @@ export const deleteFile = async (req: Request, res: Response): Promise<any> => {
       res.json({ message: "File successfully deleted" });
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const getFileInfo = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const { id } = req.params;
     const file = await File.findByPk(id);
 
@@ -110,18 +88,12 @@ export const getFileInfo = async (req: Request, res: Response): Promise<any> => 
 
     res.json(file);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const downloadFile = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const { id } = req.params;
     const file = await File.findByPk(id);
 
@@ -142,18 +114,12 @@ export const downloadFile = async (req: Request, res: Response): Promise<any> =>
       }
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };
 
 export const updateFile = async (req: Request, res: Response): Promise<any> => {
   try {
-    const accessToken = getAccessToken(req);
-
-    const result = await decodeAccessToken(accessToken);
-    if (!result.valid) return res.status(403).json({ message: result.error });
-
     const { id } = req.params;
     const existingFile = await File.findByPk(id);
 
@@ -180,7 +146,6 @@ export const updateFile = async (req: Request, res: Response): Promise<any> => {
 
     res.json({ message: "File updated successfully", file: existingFile });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    return handleServerError(error, res);
   }
 };

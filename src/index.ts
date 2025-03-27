@@ -3,7 +3,6 @@ import cors from "cors";
 import routes from "./routes";
 import sequelize from "./config/db";
 import { exec } from "child_process";
-import { upload } from "./utils/storage";
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
