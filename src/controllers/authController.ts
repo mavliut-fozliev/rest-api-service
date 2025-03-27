@@ -1,13 +1,13 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken, getAccessToken, decodeAccessToken, validateCredentials, decodeRefreshToken } from "../utils/auth";
 import Token from "../models/Token";
 
 export const signin = async (req: Request, res: Response): Promise<any> => {
-  const { id, password, deviceId } = req.body;
-
   try {
+    const { id, password, deviceId } = req.body;
+
     const validationError = validateCredentials(id, password, deviceId);
     if (validationError) return res.status(validationError.code).json({ message: validationError.error });
 
@@ -32,9 +32,9 @@ export const signin = async (req: Request, res: Response): Promise<any> => {
 };
 
 export const updateAccessToken = async (req: Request, res: Response): Promise<any> => {
-  const { refreshToken } = req.body;
-
   try {
+    const { refreshToken } = req.body;
+
     if (!refreshToken) return res.status(401).json({ message: "Refresh token required" });
 
     const result = await decodeRefreshToken(refreshToken);
@@ -52,9 +52,9 @@ export const updateAccessToken = async (req: Request, res: Response): Promise<an
 };
 
 export const signup = async (req: Request, res: Response): Promise<any> => {
-  const { id, password, deviceId } = req.body;
-
   try {
+    const { id, password, deviceId } = req.body;
+
     const validationError = validateCredentials(id, password, deviceId);
     if (validationError) return res.status(validationError.code).json({ message: validationError.error });
 
@@ -77,9 +77,9 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 };
 
 export const getUserInfo = async (req: Request, res: Response): Promise<any> => {
-  const accessToken = getAccessToken(req);
-
   try {
+    const accessToken = getAccessToken(req);
+
     const result = await decodeAccessToken(accessToken);
     if (!result.valid) return res.status(403).json({ message: result.error });
 
@@ -91,9 +91,9 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any> => 
 };
 
 export const logout = async (req: Request, res: Response): Promise<any> => {
-  const accessToken = getAccessToken(req);
-
   try {
+    const accessToken = getAccessToken(req);
+
     const result = await decodeAccessToken(accessToken);
     if (!result.valid) return res.status(403).json({ message: result.error });
 
