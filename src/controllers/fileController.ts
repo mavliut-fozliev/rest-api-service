@@ -141,7 +141,7 @@ export const updateFile = async (req: Request, res: Response): Promise<any> => {
 
     await existingFile.update(fileData);
 
-    res.json({ message: "File updated successfully", file: existingFile });
+    res.json({ message: "File updated successfully" });
   } catch (error) {
     return handleServerError(error, res);
   }

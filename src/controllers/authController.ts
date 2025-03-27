@@ -68,7 +68,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     await Token.create({ userId: id, accessToken, refreshToken, deviceId });
 
-    return res.status(201).json({ message: "User registered successfully", accessToken, refreshToken });
+    return res.status(201).json({ accessToken, refreshToken });
   } catch (error) {
     return handleServerError(error, res);
   }
