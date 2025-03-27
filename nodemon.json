@@ -2,6 +2,6 @@
   "watch": ["src"],
   "ext": "js,ts,json",
   "ignore": ["node_modules", "dist"],
-  "exec": "yarn start",
+  "exec": "yarn serve",
   "restartable": "rs"
 }

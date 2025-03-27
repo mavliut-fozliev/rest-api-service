@@ -11,21 +11,29 @@ function generateJWT(payload: object, expiresIn: any) {
   return jwt.sign(payload, SECRET_KEY, { expiresIn });
 }
 
-export function generateAccessToken(id: string) {
-  return generateJWT({ id }, "10m");
+export function generateAccessToken(id: string, deviceId: string) {
+  return generateJWT({ id, deviceId }, "10m");
 }
 
-export function generateRefreshToken(id: string) {
-  return generateJWT({ id }, "7d");
+export function generateRefreshToken(id: string, deviceId: string) {
+  return generateJWT({ id, deviceId }, "7d");
 }
 
-export function validateCredentials(id: string, password: string) {
+export function validateCredentials(id: string, password: string, deviceId: string) {
   if (!id || !password) {
-    return { error: "ID and password are required" };
+    return { code: 400, error: "ID and password are required" };
+  }
+
+  if (!deviceId) {
+    return { code: 400, error: "deviceId is required" };
   }
 
   if (typeof id !== "string" || typeof password !== "string") {
-    return { error: "ID and password must be a string" };
+    return { code: 422, error: "ID and password must be a string" };
+  }
+
+  if (typeof deviceId !== "string") {
+    return { code: 422, error: "deviceId must be a string" };
   }
 
   return null;
@@ -47,22 +55,24 @@ export function getAccessToken(req: Request) {
   return req.cookies?.access_token || req.headers?.authorization?.split(" ")[1];
 }
 
-export async function getAccessTokenId(accessToken: string) {
+export async function decodeAccessToken(accessToken: string) {
   const result = verifyToken(accessToken);
   if (!result.valid) return { valid: false, error: result.reason === "expired" ? "Access token expired" : "Invalid access token" };
 
   const savedToken = await Token.findOne({ where: { accessToken } });
   if (!savedToken) return { valid: false, error: "Invalid access token" };
 
-  return { valid: true, id: (result.decoded as Record<string, any>).id };
+  const decoded = result.decoded as Record<string, any>;
+  return { valid: true, id: decoded.id, deviceId: decoded.deviceId };
 }
 
-export async function getRefreshTokenId(refreshToken: string) {
+export async function decodeRefreshToken(refreshToken: string) {
   const result = verifyToken(refreshToken);
   if (!result.valid) return { valid: false, error: result.reason === "expired" ? "Refresh token expired" : "Invalid refresh token" };
 
   const savedToken = await Token.findOne({ where: { refreshToken } });
   if (!savedToken) return { valid: false, error: "Invalid refresh token" };
 
-  return { valid: true, id: (result.decoded as Record<string, any>).id };
+  const decoded = result.decoded as Record<string, any>;
+  return { valid: true, id: decoded.id, deviceId: decoded.deviceId };
 }
