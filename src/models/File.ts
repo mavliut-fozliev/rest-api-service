@@ -2,6 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/db";
 
 export class File extends Model {
+  public id!: string;
   public name!: string;
   public extension!: string;
   public mime_type!: string;
@@ -11,6 +12,7 @@ export class File extends Model {
 
 File.init(
   {
+    id: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
     extension: { type: DataTypes.STRING, allowNull: false },
     mime_type: { type: DataTypes.STRING, allowNull: false },
