@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Request } from "express";
 import Token from "../models/Token";
+import { ValidationError } from "./types";
 
 dotenv.config();
 
@@ -19,7 +20,14 @@ export function generateRefreshToken(id: string, deviceId: string) {
   return generateJWT({ id, deviceId }, "7d");
 }
 
-export function validateCredentials(id: string, password: string, deviceId: string) {
+const validateString = (value: string, fieldName: string): ValidationError | null => {
+  if (typeof value !== "string") {
+    return { code: 422, error: `${fieldName} must be a string` };
+  }
+  return null;
+};
+
+export function validateCredentials(id: string, password: string, deviceId: string): ValidationError | null {
   if (!id || !password) {
     return { code: 400, error: "ID and password are required" };
   }
@@ -28,13 +36,14 @@ export function validateCredentials(id: string, password: string, deviceId: stri
     return { code: 400, error: "deviceId is required" };
   }
 
-  if (typeof id !== "string" || typeof password !== "string") {
-    return { code: 422, error: "ID and password must be a string" };
-  }
+  const idError = validateString(id, "ID");
+  if (idError) return idError;
 
-  if (typeof deviceId !== "string") {
-    return { code: 422, error: "deviceId must be a string" };
-  }
+  const passwordError = validateString(password, "Password");
+  if (passwordError) return passwordError;
+
+  const deviceIdError = validateString(deviceId, "deviceId");
+  if (deviceIdError) return deviceIdError;
 
   return null;
 }

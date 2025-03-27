@@ -1,4 +1,3 @@
-import { decodeAccessToken, getAccessToken } from "../utils/auth";
 import { Request, Response } from "express";
 import path from "path";
 import File from "../models/File";
@@ -65,8 +64,7 @@ export const deleteFile = async (req: Request, res: Response): Promise<any> => {
 
     fs.unlink(filePath, async (err) => {
       if (err && err.code !== "ENOENT") {
-        console.error(err);
-        return res.status(500).json({ message: "Error deleting file" });
+        return handleServerError(err, res);
       }
 
       await file.destroy();
@@ -109,8 +107,7 @@ export const downloadFile = async (req: Request, res: Response): Promise<any> =>
 
     res.download(filePath, file.name + file.extension, (err) => {
       if (err) {
-        console.error("Error while downloading:", err);
-        res.status(500).json({ message: "Error downloading file" });
+        return handleServerError(err, res);
       }
     });
   } catch (error) {

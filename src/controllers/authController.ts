@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
-import { generateAccessToken, generateRefreshToken, getAccessToken, decodeAccessToken, validateCredentials, decodeRefreshToken } from "../utils/auth";
+import { generateAccessToken, generateRefreshToken, validateCredentials, decodeRefreshToken } from "../utils/auth";
 import Token from "../models/Token";
 import { handleServerError } from "../utils/errorHandling";
 
