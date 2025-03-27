@@ -17,12 +17,12 @@ export const signin = async (req: Request, res: Response): Promise<any> => {
     const isMatch = await user.validatePassword(password);
     if (!isMatch) return res.status(401).json({ message: "Invalid ID or password" });
 
-    await Token.destroy({ where: { id, deviceId } });
+    await Token.destroy({ where: { userId: id, deviceId } });
 
     const accessToken = generateAccessToken(id, deviceId);
     const refreshToken = generateRefreshToken(id, deviceId);
 
-    await Token.create({ id, accessToken, refreshToken, deviceId });
+    await Token.create({ userId: id, accessToken, refreshToken, deviceId });
 
     return res.json({ accessToken, refreshToken });
   } catch (error) {
@@ -42,7 +42,7 @@ export const updateAccessToken = async (req: Request, res: Response): Promise<an
 
     const accessToken = generateAccessToken(result.id, result.deviceId);
 
-    await Token.update({ accessToken }, { where: { id: result.id, deviceId: result.deviceId } });
+    await Token.update({ accessToken }, { where: { userId: result.id, deviceId: result.deviceId } });
 
     return res.json({ accessToken });
   } catch (error) {
@@ -67,7 +67,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     const accessToken = generateAccessToken(id, deviceId);
     const refreshToken = generateRefreshToken(id, deviceId);
 
-    await Token.create({ id, accessToken, refreshToken, deviceId });
+    await Token.create({ userId: id, accessToken, refreshToken, deviceId });
 
     return res.status(201).json({ message: "User registered successfully", accessToken, refreshToken });
   } catch (error) {
@@ -97,7 +97,7 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
     const result = await decodeAccessToken(accessToken);
     if (!result.valid) return res.status(403).json({ message: result.error });
 
-    await Token.destroy({ where: { id: result.id, deviceId: result.deviceId } });
+    await Token.destroy({ where: { userId: result.id, deviceId: result.deviceId } });
 
     return res.status(200).json({ message: "User logged out" });
   } catch (error) {

@@ -3,17 +3,9 @@ export async function up(queryInterface, Sequelize) {
     type: Sequelize.STRING(255),
     allowNull: false,
   });
-  await queryInterface.changeColumn("tokens", "id", {
-    type: Sequelize.STRING(255),
-    allowNull: false,
-  });
 }
 export async function down(queryInterface, Sequelize) {
   await queryInterface.changeColumn("users", "id", {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  });
-  await queryInterface.changeColumn("tokens", "id", {
     type: Sequelize.INTEGER,
     allowNull: false,
   });

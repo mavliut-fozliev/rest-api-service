@@ -10,7 +10,7 @@ class Token extends Model {
 
 Token.init(
   {
-    id: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
+    userId: { type: DataTypes.STRING, allowNull: false },
     accessToken: { type: DataTypes.STRING, allowNull: false },
     refreshToken: { type: DataTypes.STRING, allowNull: false },
     deviceId: { type: DataTypes.STRING, allowNull: false },
