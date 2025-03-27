@@ -17,7 +17,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const id = path.parse(file.filename).name;
+    const id = file.filename;
     const name = path.parse(file.originalname).name;
 
     const fileData = {
@@ -77,7 +77,7 @@ export const deleteFile = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    const filePath = path.join(getStoragePath(), file.id + file.extension);
+    const filePath = path.join(getStoragePath(), file.id);
 
     fs.unlink(filePath, async (err) => {
       if (err && err.code !== "ENOENT") {
@@ -129,7 +129,7 @@ export const downloadFile = async (req: Request, res: Response): Promise<any> =>
       return res.status(404).json({ message: "File not found" });
     }
 
-    const filePath = path.join(getStoragePath(), file.id + file.extension);
+    const filePath = path.join(getStoragePath(), file.id);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "The file is missing from the server" });
@@ -141,6 +141,44 @@ export const downloadFile = async (req: Request, res: Response): Promise<any> =>
         res.status(500).json({ message: "Error downloading file" });
       }
     });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateFile = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const accessToken = getAccessToken(req);
+
+    const result = await decodeAccessToken(accessToken);
+    if (!result.valid) return res.status(403).json({ message: result.error });
+
+    const { id } = req.params;
+    const existingFile = await File.findByPk(id);
+
+    if (!existingFile) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const name = path.parse(file.originalname).name;
+
+    const fileData = {
+      name,
+      extension: path.extname(file.originalname),
+      mime_type: file.mimetype,
+      size: file.size,
+      upload_date: new Date(),
+    };
+
+    await existingFile.update(fileData);
+
+    res.json({ message: "File updated successfully", file: existingFile });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });

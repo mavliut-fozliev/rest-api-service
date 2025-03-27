@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-app.use(upload.single("file"));
 app.use(express.json());
 
 app.use("/api", routes);
