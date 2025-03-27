@@ -15,7 +15,7 @@ Token.init(
     refreshToken: { type: DataTypes.STRING, allowNull: false },
     deviceId: { type: DataTypes.STRING, allowNull: false },
   },
-  { sequelize, tableName: "tokens", modelName: "Token" }
+  { sequelize, tableName: "tokens", modelName: "Token", timestamps: false }
 );
 
 export default Token;
